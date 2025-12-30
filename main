@@ -1,0 +1,152 @@
+local Data = loadstring(game:HttpGet("https://raw.githubusercontent.com/Hann28e7/instance2string/refs/heads/main/properties"))()
+
+-- Functions
+
+function Create(inst:Instance, parent:Instance, props:{})
+	inst.Parent = parent
+
+	for propname, propvalue in props do
+		inst[propname] = propvalue
+	end
+
+	return inst
+end
+
+local function serializeValue(value)
+	local t = typeof(value)
+
+	if t == "Vector3" then
+		return { __type = "Vector3", x = value.X, y = value.Y, z = value.Z }
+
+	elseif t == "Color3" then
+		return { __type = "Color3", r = value.R, g = value.G, b = value.B }
+
+	elseif t == "CFrame" then
+		return { __type = "CFrame", components = { value:GetComponents() } }
+
+	elseif t == "EnumItem" then
+		return {
+			__type = "Enum",
+			enumType = tostring(value.EnumType),
+			name = value.Name
+		}
+
+	elseif t == "BrickColor" then
+		return { __type = "BrickColor", name = value.Name }
+		
+	elseif t == "UDim" then
+		return { __type = "UDim", Scale = value.Scale, Offset = value.Offset }
+
+	elseif t == "UDim2" then
+		return {
+			__type = "UDim2",
+			x = { value.X.Scale, value.X.Offset },
+			y = { value.Y.Scale, value.Y.Offset }
+		}
+
+	elseif t == "NumberSequence" then
+		local keypoints = {}
+		for _, kp in value.Keypoints do
+			table.insert(keypoints, { kp.Time, kp.Value, kp.Envelope })
+		end
+		return { __type = "NumberSequence", keypoints = keypoints }
+
+	elseif t == "ColorSequence" then
+		local keypoints = {}
+		for _, kp in value.Keypoints do
+			table.insert(keypoints, {
+				kp.Time,
+				{ kp.Value.R, kp.Value.G, kp.Value.B },
+				kp.Envelope
+			})
+		end
+		return { __type = "ColorSequence", keypoints = keypoints }
+
+	elseif t == "string" or t == "number" or t == "boolean" then
+		return value
+	end
+
+	-- Fallback (unsupported types)
+	return nil
+end
+
+local function serializeInstance(inst: Instance)
+	local t = {
+		ClassName = inst.ClassName,
+		Name = inst.Name,
+		Properties = {},
+		Children = {}
+	}
+
+	if Data[inst.ClassName] then
+		for _, prop in Data[inst.ClassName] do
+			local ok, value = pcall(function()
+				return inst[prop]
+			end)
+
+			if ok then
+				local serialized = serializeValue(value)
+				if serialized ~= nil then
+					t.Properties[prop] = serialized
+				end
+			end
+		end
+	end
+
+	for _, child in inst:GetChildren() do
+		table.insert(t.Children, serializeInstance(child))
+	end
+
+	return t
+end
+
+
+-- Variables
+local hs = game:GetService("HttpService")
+
+local new = Instance.new
+
+local plr = game.Players.LocalPlayer
+local plrgui = plr:WaitForChild("PlayerGui")
+
+local screengui = Create(new("ScreenGui"), plrgui, {Name = "I2S",IgnoreGuiInset = true, ResetOnSpawn = false})
+local cg = Create(new("CanvasGroup"), screengui, {
+	BackgroundColor3 = Color3.fromRGB(4,3,35),
+	Position = UDim2.new(0.321, 0, 0.308, 0),
+	Size = UDim2.new(.357, 0, .383, 0)
+})
+local cguic = Create(new("UICorner"), cg, {CornerRadius = UDim.new(0.05, 0)})
+local cguis = Create(new("UIStroke"), cg, {Color = Color3.fromRGB(47, 47, 47), Thickness = 4})
+
+local nav = Create(new("Frame"), cg, {Size = UDim2.new(1, 0, .056, 0), BackgroundColor3 = Color3.fromRGB(255,255,255)})
+local x:TextButton = Create(new("TextButton"), nav, {BackgroundColor3 = Color3.fromRGB(212,0,4), Position = UDim2.new(.936, 0, 0, 0), Size = UDim2.new(.094, 0, 1, 0), TextScaled = true, TextColor3 = Color3.fromRGB(255,255,255), Text = "x"})
+local xuia = Create(new("UIAspectRatioConstraint"), x, {AspectRatio = 2})
+
+local tl = Create(new("TextLabel"), cg, {BackgroundTransparency = 1, Position = UDim2.new(.145, 0, .158, 0), Size = UDim2.new(.709, 0, .236, 0), FontFace = Font.fromName("Montserrat",Enum.FontWeight.Regular,Enum.FontStyle.Normal), TextScaled = true, Text = "Instance 2 String", TextColor3 = Color3.fromRGB(255,255,255)})
+
+local tb:TextBox = Create(new("TextBox"), cg, {BackgroundColor3 = Color3.fromRGB(18,18,18), ClearTextOnFocus = false, PlaceholderText = "I will turn [game.\"input\"] into a string...", TextScaled = true, TextColor3 = Color3.fromRGB(255,255,255), Position = UDim2.new(.131, 0, .585, 0), Size = UDim2.new(.739, 0, .092, 0), Text = "", FontFace = Font.fromName("SourceSansPro",Enum.FontWeight.Regular,Enum.FontStyle.Normal)})
+local tbuic = Create(new("UICorner"), tb, {CornerRadius = UDim.new(.2, 0)})
+local tbuis = Create(new("UIStroke"), tb, {ApplyStrokeMode = Enum.ApplyStrokeMode.Border, Color = Color3.fromRGB(255,255,255), Thickness = 1})
+
+local b:TextButton = Create(new("TextButton"), cg, {BackgroundColor3 = Color3.fromRGB(112, 163, 109), Position = UDim2.new(.303, 0, .746, 0), Size = UDim2.new(.394, 0, .116, 0), Text = "Generate!", FontFace = Font.fromName("SourceSansPro",Enum.FontWeight.Regular,Enum.FontStyle.Normal), TextScaled = true, TextColor3 = Color3.fromRGB(0,0,0)})
+local buic = Create(new("UICorner"), b, {CornerRadius = UDim.new(0.2,0)})
+
+-- Events
+
+x.MouseButton1Click:Connect(function()
+	cg:Destroy()
+end)
+
+b.MouseButton1Click:Connect(function()
+	local s1, err1 = pcall(function()
+		local text = tb.Text
+		local selected = game[tb.Text]
+		
+		tb.Text = hs:JSONEncode(serializeInstance(selected))
+	end)
+
+	if not s1 then
+		warn("Error S1: "..err1)
+		tb.Text = err1
+	end
+end)
