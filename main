@@ -106,9 +106,9 @@ local hs = game:GetService("HttpService")
 local new = Instance.new
 
 local plr = game.Players.LocalPlayer
-local plrgui = plr:WaitForChild("PlayerGui")
+local coregui = game:GetService("CoreGui")
 
-local screengui = Create(new("ScreenGui"), plrgui, {Name = "I2S",IgnoreGuiInset = true, ResetOnSpawn = false})
+local screengui = Create(new("ScreenGui"), coregui, {Name = "I2S",IgnoreGuiInset = true, ResetOnSpawn = false})
 local cg = Create(new("CanvasGroup"), screengui, {
 	BackgroundColor3 = Color3.fromRGB(4,3,35),
 	Position = UDim2.new(0.321, 0, 0.308, 0),
