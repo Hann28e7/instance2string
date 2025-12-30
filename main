@@ -35,7 +35,7 @@ local function serializeValue(value)
 		return { __type = "BrickColor", name = value.Name }
 		
 	elseif t == "UDim" then
-		return { __type = "UDim", Scale = value.Scale, Offset = value.Offset }
+		return { __type = "UDim", scale = value.Scale, offset = value.Offset }
 
 	elseif t == "UDim2" then
 		return {
@@ -56,8 +56,7 @@ local function serializeValue(value)
 		for _, kp in value.Keypoints do
 			table.insert(keypoints, {
 				kp.Time,
-				{ kp.Value.R, kp.Value.G, kp.Value.B },
-				kp.Envelope
+				{ kp.Value.R, kp.Value.G, kp.Value.B }
 			})
 		end
 		return { __type = "ColorSequence", keypoints = keypoints }
