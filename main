@@ -147,24 +147,30 @@ end)
 b.MouseButton1Click:Connect(function()
 	local s1, err1 = pcall(function()
 		if tb.Text:sub(1,11):lower() == "setpagesize" then
-			PAGE_SIZE = tonumber(tb.Text:sub(12,tb.Text:len()))
-			tb.Text = "PAGE_SIZE set to "..tb.Text:sub(12,tb.Text:len())
+			local n = tonumber(tb.Text:sub(12,tb.Text:len()))
+			assert(n and n > 0, "Invalid page size")
+			
+			PAGE_SIZE = n
+			tb.Text = "PAGE_SIZE set to "..tostring(n)
 		else
 			if cangenerate then
 				cangenerate = false
 				
 				local text = tb.Text
-				local selected = game[tb.Text]
+				local selected = game:FindFirstChild(tb.Text)
+				if not selected then
+					error("Instance not found: "..tb.Text)
+				end
 			
 				json = hs:JSONEncode(serializeInstance(selected))
 				cursor = 1
 				length = #json
 				copycurrent = 1
-				copyamount = ((length - (length % PAGE_SIZE)) / PAGE_SIZE) + 1
+				copyamount = math.ceil(length / PAGE_SIZE)
 				
 				b.Text = "Copy Text ("..tostring(copycurrent).."/"..tostring(copyamount)..")"
 			else
-				local chunk = json:sub(cursor, cursor + PAGE_SIZE - 1)
+				local chunk = json:sub(cursor, math.min(cursor + PAGE_SIZE - 1, length))
 				cursor += PAGE_SIZE
 				setclipboard(chunk)
 				
@@ -177,6 +183,7 @@ b.MouseButton1Click:Connect(function()
 				end
 			end
 		end
+		
 	end)
 
 	if not s1 then
