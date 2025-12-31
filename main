@@ -155,19 +155,23 @@ b.MouseButton1Click:Connect(function()
 		else
 			if cangenerate then
 				cangenerate = false
-				
+
 				local text = tb.Text
 				local selected = game:FindFirstChild(tb.Text)
 				if not selected then
 					error("Instance not found: "..tb.Text)
 				end
-			
+
 				json = hs:JSONEncode(serializeInstance(selected))
 				cursor = 1
 				length = #json
 				copycurrent = 1
 				copyamount = math.ceil(length / PAGE_SIZE)
-				
+
+				local chunk = json:sub(cursor, math.min(cursor + PAGE_SIZE - 1, length))
+				setclipboard(chunk)
+				cursor += PAGE_SIZE
+
 				b.Text = "Copy Text ("..tostring(copycurrent).."/"..tostring(copyamount)..")"
 			else
 				local chunk = json:sub(cursor, math.min(cursor + PAGE_SIZE - 1, length))
