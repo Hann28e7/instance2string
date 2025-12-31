@@ -130,6 +130,8 @@ local tbuis = Create(new("UIStroke"), tb, {ApplyStrokeMode = Enum.ApplyStrokeMod
 local b:TextButton = Create(new("TextButton"), cg, {BackgroundColor3 = Color3.fromRGB(112, 163, 109), Position = UDim2.new(.303, 0, .746, 0), Size = UDim2.new(.394, 0, .116, 0), Text = "Generate!", FontFace = Font.fromName("SourceSansPro",Enum.FontWeight.Regular,Enum.FontStyle.Normal), TextScaled = true, TextColor3 = Color3.fromRGB(0,0,0)})
 local buic = Create(new("UICorner"), b, {CornerRadius = UDim.new(0.2,0)})
 
+local PAGE_SIZE = 100000
+
 -- Events
 
 x.MouseButton1Click:Connect(function()
