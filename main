@@ -141,7 +141,17 @@ b.MouseButton1Click:Connect(function()
 		local text = tb.Text
 		local selected = game[tb.Text]
 		
-		setclipboard(hs:JSONEncode(serializeInstance(selected)))
+		local json = hs:JSONEncode(serializeInstance(selected))
+		local cursor = 1
+		local length = #json
+
+		while cursor <= length do
+			local chunk = json:sub(cursor, cursor + PAGE_SIZE - 1)
+			setclipboard(chunk)
+
+			cursor += PAGE_SIZE
+		end
+
 		tb.Text = "Success!"
 	end)
 
