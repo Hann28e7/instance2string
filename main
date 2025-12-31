@@ -141,7 +141,8 @@ b.MouseButton1Click:Connect(function()
 		local text = tb.Text
 		local selected = game[tb.Text]
 		
-		tb.Text = hs:JSONEncode(serializeInstance(selected))
+		setclipboard(hs:JSONEncode(serializeInstance(selected)))
+		tb.Text = "Success!"
 	end)
 
 	if not s1 then
