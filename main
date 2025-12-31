@@ -131,6 +131,12 @@ local b:TextButton = Create(new("TextButton"), cg, {BackgroundColor3 = Color3.fr
 local buic = Create(new("UICorner"), b, {CornerRadius = UDim.new(0.2,0)})
 
 local PAGE_SIZE = 100000
+local json = ""
+local cursor = 1
+local length = 0
+local copycurrent = 1
+local copyamount = 1
+local cangenerate = true
 
 -- Events
 
@@ -140,20 +146,33 @@ end)
 
 b.MouseButton1Click:Connect(function()
 	local s1, err1 = pcall(function()
-		local text = tb.Text
-		local selected = game[tb.Text]
+		if cangenerate then
+			cangenerate = false
+			
+			local text = tb.Text
+			local selected = game[tb.Text]
 		
-		local json = hs:JSONEncode(serializeInstance(selected))
-		local cursor = 1
-		local length = #json
-
-		while cursor <= length do
+			json = hs:JSONEncode(serializeInstance(selected))
+			cursor = 1
+			length = #json
+			copycurrent = 1
+			copyamount = ((length - (length % PAGE_SIZE)) / PAGE_SIZE) + 1
+			
+			b.Text = "Copy Text ("..tostring(copycurrent).."/"..tostring(copyamount)..")"
+		else
 			local chunk = json:sub(cursor, cursor + PAGE_SIZE - 1)
-			setclipboard(chunk)
-
 			cursor += PAGE_SIZE
+			setclipboard(chunk)
+			
+			if copycurrent == copyamount then
+				b.Text = "Generate!"
+				cangenerate = true
+			else
+				copycurrent += 1
+				b.Text = "Copy Text ("..tostring(copycurrent).."/"..tostring(copyamount)..")"
+			end
 		end
-
+		
 		tb.Text = "Success!"
 	end)
 
