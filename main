@@ -146,30 +146,35 @@ end)
 
 b.MouseButton1Click:Connect(function()
 	local s1, err1 = pcall(function()
-		if cangenerate then
-			cangenerate = false
-			
-			local text = tb.Text
-			local selected = game[tb.Text]
-		
-			json = hs:JSONEncode(serializeInstance(selected))
-			cursor = 1
-			length = #json
-			copycurrent = 1
-			copyamount = ((length - (length % PAGE_SIZE)) / PAGE_SIZE) + 1
-			
-			b.Text = "Copy Text ("..tostring(copycurrent).."/"..tostring(copyamount)..")"
+		if tb.Text:sub(1,11):lower() == "setpagesize" then
+			PAGE_SIZE = tonumber(tb.Text:sub(12,tb.Text:len()))
+			tb.Text = "PAGE_SIZE set to "..tb.Text:sub(12,tb.Text:len())
 		else
-			local chunk = json:sub(cursor, cursor + PAGE_SIZE - 1)
-			cursor += PAGE_SIZE
-			setclipboard(chunk)
+			if cangenerate then
+				cangenerate = false
+				
+				local text = tb.Text
+				local selected = game[tb.Text]
 			
-			if copycurrent == copyamount then
-				b.Text = "Generate!"
-				cangenerate = true
-			else
-				copycurrent += 1
+				json = hs:JSONEncode(serializeInstance(selected))
+				cursor = 1
+				length = #json
+				copycurrent = 1
+				copyamount = ((length - (length % PAGE_SIZE)) / PAGE_SIZE) + 1
+				
 				b.Text = "Copy Text ("..tostring(copycurrent).."/"..tostring(copyamount)..")"
+			else
+				local chunk = json:sub(cursor, cursor + PAGE_SIZE - 1)
+				cursor += PAGE_SIZE
+				setclipboard(chunk)
+				
+				if copycurrent == copyamount then
+					b.Text = "Generate!"
+					cangenerate = true
+				else
+					copycurrent += 1
+					b.Text = "Copy Text ("..tostring(copycurrent).."/"..tostring(copyamount)..")"
+				end
 			end
 		end
 		
